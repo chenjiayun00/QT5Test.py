@@ -6,7 +6,7 @@ from pdfminer.pdfdocument import PDFDocument
 from pdfminer.pdfdevice import PDFDevice
 from pdfminer.pdfpage import PDFPage
 
-import pdfplumber
+# import pdfplumber
 from PyQt5 import QtWidgets
 import os
 import sys
@@ -115,65 +115,83 @@ def read_pdf(pdf_path):
     return w6_fileName, "W6格式转换成功"
 
     # 使用pdfminer
-def read_pdf_by_pdfplumber(pdf_path):
-
-    t_start = time.time()
-    print("开始读取")
-    txt_write_flag = False
-    read_text = "" # 读取到的源文件
-    write_txt = ""
-    jzc_re_com1 = re.compile(r"PGclient\.writeReg\(\'WR_DISPLAY_REG[\s]*FF[\s]*([0-9a-fA-F]{2})[\s]*")  # jzc格式正则表达式1
-    jzc_re_com2 = re.compile(r"WR_DISPLAY_REG[\s]*FF[\s]*([0-9a-fA-F]{2})[\s]*")  # jzc格式正则表达式2
-    jzc_re_com3 = re.compile(r"([0-9a-fA-F]{2})")  # jzc 将0000转换成0x00,0x00
-    re_compile_page = re.compile(r"\d+\s*/\s*\d+")  # 页码的正则表达式
-
-    jzc_flag = 0 # jzc标识符
-    test_flag = 0 #
-
-    # 打开pdf文档
-    fp = pdfplumber.open(pdf_path)
-    page_num = len(fp.pages)
-    # with-open-as 进行 PDF -> TXT
-    with pdfplumber.open(pdf_path) as pdf:
-
-        for i in range(page_num):
-            page = pdf.pages[i]
-            t_start1 = time.time()
-            text = page.extract_text()
-
-            t_end = time.time()
-            print("读取一页耗时：", t_end - t_start1)
-            text = re.sub(re_compile_page, "\n", text)  # 页码改为换行符
-            if text != None:
-                read_text += text
-                # print(text)
-                print("第{%d}页读写完成"%(i))
-
-    t_end = time.time()
-    print("读取耗时：",t_end - t_start)
-    text_arr = read_text.split("\n")
-    write_txt = ""
-    for txt in text_arr:
-        if re.findall(r"III、[\s]*Initial[\s]*Code[\s]*[^\.]", txt):  # txt的内容从W6平台格式后面开始
-            txt_write_flag = True
-            txt = ""
-        if re.findall(r"Sleep out[\s\S]*29.", txt):  # 将Sleep out ...(29)去掉
-            txt = re.sub(r"Sleep out[\s\S]*29.", "", txt)
-        if re.findall(r"需要烧录的[\s]*Page：",txt):  # txt的内容到：需要烧录的 Page：结束
-            txt_write_flag = False
-            break
-        if txt_write_flag == True:
-            write_txt += txt
-
-    pdf2txt_fileName = pdf_path.replace(".pdf", "PDF直出.txt")
-    with open(pdf2txt_fileName, "w", encoding="utf-8") as fw1:
-        fw1.write(write_txt)
-    print(write_txt)
-    t_end = time.time()
-    print("读写耗时：", t_end - t_start)
-    print("读取结束")
-
-    return pdf2txt_fileName, "PDF文档读取成功"
+    # 使用pdfplumber
+# def read_pdf_by_pdfplumber(pdf_path):
+#
+#     t_start = time.time()
+#     print("开始读取")
+#     txt_write_flag = False
+#     read_text = "" # 读取到的源文件
+#     write_txt = ""
+#     jzc_re_com1 = re.compile(r"(PGclient\.writeReg\(\'WR_DISPLAY_REG[\s]*FF[\s]*)([0-9a-fA-F]{2})[\s]*")  # jzc格式正则表达式1
+#     jzc_re_com2 = re.compile(r"WR_DISPLAY_REG[\s]*FF[\s]*([0-9a-fA-F]{2})[\s]*")  # jzc格式正则表达式2
+#     jzc_re_com3 = re.compile(r"([0-9a-fA-F]{2})")  # jzc 将0000转换成0x00,0x00
+#     re_compile_page = re.compile(r"\d+\s*/\s*\d+")  # 页码的正则表达式
+#
+#     jzc_flag = 0 # jzc标识符
+#     test_flag = 0 #
+#
+#     # 打开pdf文档
+#     fp = pdfplumber.open(pdf_path)
+#     page_num = len(fp.pages)
+#     # with-open-as 进行 PDF -> TXT
+#     with pdfplumber.open(pdf_path) as pdf:
+#
+#         for i in range(page_num):
+#             page = pdf.pages[i]
+#             t_start1 = time.time()
+#             text = page.extract_text()
+#
+#             t_end = time.time()
+#             print("读取一页耗时：", t_end - t_start1)
+#             text = re.sub(re_compile_page, "\n", text)  # 页码改为换行符
+#             if text != None:
+#                 read_text += text
+#                 # print(text)
+#                 print("第{%d}页读写完成"%(i))
+#
+#     t_end = time.time()
+#     print("读取耗时：",t_end - t_start)
+#     text_arr = read_text.split("\n")
+#     write_txt = ""
+#     W6_text = ""
+#     start_flag = 0
+#     for txt in text_arr:
+#         if re.findall(r"III、[\s]*Initial[\s]*Code", txt):  # 开始截取
+#             start_flag += 1
+#             if start_flag == 2:
+#                 txt_write_flag = True
+#                 txt = ""
+#         if re.findall(r"Sleep out", txt):  # 将Sleep out ...(29)去掉
+#             txt_write_flag = False
+#             break
+#
+#         if txt_write_flag == True:
+#             write_txt += txt
+#     if re.search(jzc_re_com1, write_txt):   #
+#         write_txt = re.sub(jzc_re_com1, "\n" + r"\1\2", write_txt)    # 原格式
+#
+#         W6_text = write_txt.strip().replace("#", "//").replace("\n", "").replace(" ", "") # W6格式
+#         W6_text = re.sub(jzc_re_com1, r"REGS.WRITE(0,39\2", W6_text)
+#         W6_text = W6_text.replace(r"$$", "")  # REGS.WRITE(0,0x39,0x78,$$0x1D
+#         W6_text = jzc_re_com3.sub(r"0x\1,", W6_text)  # 0000替换成0x00,0x00格式
+#         W6_text = W6_text.replace(r",')", ")")  # 将"')"替换成 ")"
+#         W6_text = re.sub(r"0xDe,lay0x([0-9]{2}),([0-9]*)ms", r"//TIME.DELAY(\1\2)",W6_text)  # 将0xDe,lay0x10,0ms)替换成TIME.DELAY(100)
+#         W6_text = re.sub(r"0x([0-9]{2}),([0-9]*[HZhz]{2})", r"\1\2", W6_text)  # 将0x12,0Hz 变成120HZ
+#         W6_text = W6_text.replace("REGS.WRITE(", "\nREGS.WRITE(")  # 230530
+#
+#     pdf2txt_fileName = pdf_path.replace(".pdf", "PDF直出.txt")
+#     with open(pdf2txt_fileName, "w", encoding="utf-8") as fw1:
+#         fw1.write(write_txt)
+#         print(write_txt)
+#     w6_fileName = pdf_path.replace(".pdf", "_W6.txt")
+#     with open(w6_fileName, "w", encoding="utf-8") as fw:
+#         fw.write(W6_text)
+#     t_end = time.time()
+#     print("读写耗时：", t_end - t_start)
+#     print("读取结束")
+#
+#     return w6_fileName, "PDF文档读取成功"
 
 def w6_to_lua(w6_file_name, lua_type):
     # w6_str_a = "REGS.WRITE(0,0x05,"
@@ -237,7 +255,8 @@ def w6_to_lua(w6_file_name, lua_type):
 
 def w6_to_6404(fileName, lua_type):
     if str(fileName).endswith(".pdf"):
-        w6_fileName, mesg = read_pdf_by_pdfplumber(fileName)
+        w6_fileName, mesg = read_pdf(fileName)
+        # w6_fileName, mesg = read_pdf_by_pdfplumber(fileName)
         lua_file_name, mesg = w6_to_lua(w6_fileName, lua_type)
     elif str(fileName).upper().endswith(".TXT"):
         w6_fileName = fileName
@@ -248,7 +267,8 @@ def w6_to_6404(fileName, lua_type):
 
 def w6_to_6601A_C(fileName, lua_type):
     if str(fileName).endswith(".pdf"):
-        w6_fileName, mesg = read_pdf_by_pdfplumber(fileName)
+        w6_fileName, mesg = read_pdf(fileName)
+        # w6_fileName, mesg = read_pdf_by_pdfplumber(fileName)
         lua_file_name, mesg = w6_to_lua(w6_fileName, lua_type)
     elif str(fileName).upper().endswith(".TXT"):
         w6_fileName = fileName
@@ -260,7 +280,8 @@ def w6_to_6601A_C(fileName, lua_type):
 
 def w6_to_6601A_D(fileName, lua_type):
     if str(fileName).endswith(".pdf"):
-        w6_fileName, mesg = read_pdf_by_pdfplumber(fileName)
+        w6_fileName, mesg = read_pdf(fileName)
+        # w6_fileName, mesg = read_pdf_by_pdfplumber(fileName)
         lua_file_name, mesg = w6_to_lua(w6_fileName, lua_type)
     elif str(fileName).upper().endswith(".TXT"):
         w6_fileName = fileName
@@ -273,15 +294,16 @@ def w6_to_6601A_D(fileName, lua_type):
 if __name__ =="__main__":
     BASE_PATH = os.path.dirname(os.getcwd())
     # pdf_name = r"file\G2667FP108FF-006_电讯检&Gam_V01(VM4_RD)_20220314.pdf"
-    pdf_name = r"C:\Users\10176\Desktop\20230920-V04\G3678FP102FF-00C_电讯检_V04_20230920.pdf"
+    pdf_name = r"C:\Users\10176\Desktop\G3678FP102FF-00C_电讯检_V04_20230920.pdf"
     # txt_name = r"file\G2678FA101FF-006_电讯检_V04(VM4_NT)_20211028.pdf"
     pdf_path = os.path.join(BASE_PATH, pdf_name)
     # txt_path = os.path.join(BASE_PATH, txt_name)
-    w6_fileName = r"C:\Users\10176\Desktop\20230920-V04\G3678FP102FF-00C_电讯检_V04_20230920"
+    w6_fileName = r"C:\Users\10176\Desktop\G3678FP102FF-00C_电讯检_V04_20230920"
     w6_fileName = os.path.join(BASE_PATH, w6_fileName)
 
     # read_pdf(pdf_path)
     # w6_to_6404(w6_fileName, "6404")
+    # read_pdf(pdf_name)
     read_pdf_by_pdfplumber(pdf_name)
     # fileName = r"C:\Users\10176\Desktop\D30全代码.txt"
     # lua_type = "6601A-D-PHY"

@@ -18,13 +18,14 @@ BASE_DIR = os.getcwd()
 def get_txt(chType, fileName):
     """
     将对应的pdf文件转换成对应格式的txt文件
-    :param path: pdf文件路径
+    :param fileName: pdf文件路径
     :param chType: 需要转换成的格式
     :return:
     """
     remesg = ""
     if chType == "W6":
         result_file, remesg = pdf2txt.read_pdf(fileName)
+        # result_file, remesg = pdf2txt.read_pdf_by_pdfplumber(fileName)
     elif chType == "6404":
         result_file, remesg = pdf2txt.w6_to_6404(fileName, chType)
     elif chType == "6601A-D-PHY":
@@ -37,7 +38,7 @@ def get_txt(chType, fileName):
 
 def creat_images(mkPath, w, h, mkType,*args):
     """
-    :param mkPath: 图片保存路径
+    :param mkPath: 图片保存路径11111
     :param w: 图片宽度
     :param h: 图片高度
     :param mkType: 类型
@@ -166,7 +167,8 @@ class MyWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.lineEdit_Width.setText("100")
         self.lineEdit_Height.setText("200")
         self.lineEdit_Demura.setText("16,32,64,128,192,224")
-        self.pushButton_CreatPic.clicked.connect(self.pushButton_CreatPic_clcik)
+        self.pushButton_CreatPic.clicked.connect(self.pushButton_CreatPic_click)
+        self.pushButton_OpenPic.clicked.connect(self.pushButton_OpenPic_click)
         # 设置需要生成的画面
         # self.checkBox_Gray.setCheckState(self, True)
         # self.checkBox_Aod.setCheckState(self, True)
@@ -176,7 +178,7 @@ class MyWindow(QtWidgets.QMainWindow, Ui_MainWindow):
     def update_text_edit_log(self, text):  # 槽函数，带有一个str参数,用来接收自定义信号传递的值
         self.textEdit_Log.append(text)   # 往控件textEdit_Log中追加一行
 
-    def pushButton_CreatPic_clcik(self):
+    def pushButton_CreatPic_click(self):
         AodCreat.img_w = int(self.lineEdit_Width.text())    # 图片宽度
         AodCreat.img_h = int(self.lineEdit_Height.text())    # 图片高度
         Demura_gray_list = self.lineEdit_Demura.text().split(",")   # 将字符串"16,32,64,128,192,224" 转换成列表 ['16', '32', '64', '128', '192', '224']
@@ -240,6 +242,10 @@ class MyWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         # self.textEdit_Log.setText("图片生成完成")
         QMessageBox.information(self, "提示", "点击", QMessageBox.Yes | QMessageBox.No, QMessageBox.Yes)
 
+    def pushButton_OpenPic_click(self):
+        # 利用explorer.exe执行
+        start_directory = r'.\TEMS'
+        os.system("explorer.exe %s" % start_directory)
     # ============图片生成界面==============
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
